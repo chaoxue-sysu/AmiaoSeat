@@ -3,7 +3,7 @@
 
 ## 使用方法
 ### 安装
-Windows用户可直接下载[安装包](Setup.exe)，进行安装使用。
+Windows用户可直接下载 [安装包](https://github.com/chaoxue-sysu/AmiaoSeat/releases/download/v1.0/Setup.exe)，进行安装使用。
 
 其他系统用户可以安装Python环境（Python>3.6）和pip,并安装依赖包requirements.txt，执行main.py程序。
 ```
