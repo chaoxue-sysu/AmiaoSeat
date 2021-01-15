@@ -5,9 +5,15 @@ import tkinter.filedialog
 import tkinter.messagebox
 from tkinter import *
 from tkinter.font import Font
-import os
+from PIL import Image,ImageTk
+import os,threading
 import openpyxl
 import random
+import time
+
+
+
+curWidth,curHight=640,280
 
 def new_win():
     tkinter.messagebox.showinfo(title='提示', message='运行成功！点击 “确定” 查看结果！')
@@ -148,23 +154,37 @@ def check():
     # tkinter.filedialog.askopenfilename()
 
 def main():
+    # return
     global entry1,entry2
-    root = Tk()
-    # root.geometry('480x280')
-    root.title('阿喵排排座 V1.0')
-    entry1=Entry(root,width=50,font=Font(family='Times', size=10))
-    entry2=Entry(root,width=10,font=Font(family='Times', size=10))
-    root.iconbitmap('logo.ico')
-    lablet=Label(root,text='阿喵排排座 V1.0',font=Font(family='Times', size=24, weight='bold'),fg='black')
-    lable1=Label(root,text='输入.xlsx文件（可多选）',font=Font(family='Times', size=12, weight='bold'),width=25)
-    sele_btn1=Button(root,command=select_multi,text='选择文件',font=Font(family='Times', size=10, weight='bold'),bg='pink',fg='black',width=8)
+    global rootMSCT,root,finish_load
+    finish_load=False
+    rootMSCT=Tk()
+    rootMSCT.attributes('-alpha',0)
+    # root.overrideredirect(True)
+    # global curWidth,curHeight
+    # curWidth,curHight=640,280
+    size_xy = get_pos(curWidth,curHight,rootMSCT)
+    rootMSCT.geometry(size_xy)
 
-    lable2=Label(root,text='输出目录',font=Font(family='Times', size=12, weight='bold'),width=10)
-    sele_btn2=Button(root,command=select_dir,text='选择目录',font=Font(family='Times', size=10, weight='bold'),bg='pink',fg='black',width=8)
+    root=Toplevel()
 
-    btn=Button(root,command=do,text='点击开始排座',font=Font(family='Times', size=15, weight='bold'),bg='pink',fg='black',width=20)
+    tMain=threading.Thread(target=showWelcome)
+    tMain.start()
+    t1=threading.Thread(target=closeWelcome)
+    t1.start()
 
+    rootMSCT.title('阿喵排排座 V1.0')
+    entry1=Entry(rootMSCT,width=50,font=Font(family='Times', size=10))
+    entry2=Entry(rootMSCT,width=10,font=Font(family='Times', size=10))
+    rootMSCT.iconbitmap('logo.ico')
+    lablet=Label(rootMSCT,text='阿喵排排座 V1.0',font=Font(family='Times', size=24, weight='bold'),fg='black')
+    lable1=Label(rootMSCT,text='输入.xlsx文件（可多选）',font=Font(family='Times', size=12, weight='bold'),width=25)
+    sele_btn1=Button(rootMSCT,command=select_multi,text='选择文件',font=Font(family='Times', size=10, weight='bold'),bg='pink',fg='black',width=8)
 
+    lable2=Label(rootMSCT,text='输出目录',font=Font(family='Times', size=12, weight='bold'),width=10)
+    sele_btn2=Button(rootMSCT,command=select_dir,text='选择目录',font=Font(family='Times', size=10, weight='bold'),bg='pink',fg='black',width=8)
+
+    btn=Button(rootMSCT,command=do,text='点击开始排座',font=Font(family='Times', size=15, weight='bold'),bg='pink',fg='black',width=20)
     lablet.grid(row=0,column=0,pady=35,sticky=N+S+E+W,columnspan=3)
     lable1.grid(row=1,column=0,sticky=N+S+E+W)
     entry1.grid(row=1,column=1,sticky=N+S+E+W)
@@ -174,17 +194,69 @@ def main():
     sele_btn2.grid(row=2,column=2,sticky=N+S+E+W, pady=5)
     btn.grid(row=3,column=0,columnspan=3,sticky=N+S,pady=30)
 
-    # curWidth = root.winfo_width()
-    # curHight = root.winfo_height()
-    curWidth,curHight=640,280
-    scn_w, scn_h = root.maxsize()
-    cen_x = (scn_w - curWidth) / 2
-    cen_y = 0.8*(scn_h - curHight) / 2
-    size_xy = '%dx%d+%d+%d' % (curWidth, curHight, cen_x, cen_y)
-    root.geometry(size_xy)
-    root.mainloop()
+    print('finish load main')
+    finish_load=True
+    rootMSCT.mainloop()
+
+def get_pos(w,h,wind):
+    scn_w, scn_h = wind.maxsize()
+    cen_x = (scn_w - w) / 2
+    cen_y = 0.8*(scn_h - h) / 2
+    size_xy = '%dx%d+%d+%d' % (w, h, cen_x, cen_y)
+    return size_xy
+
+def showWelcome():
+    #得到屏幕高度
+    root.overrideredirect(True)
+    root.attributes("-alpha", 1)#窗口透明度（1为不透明，0为全透明）
+    #设置窗口位于屏幕中部
+    xw,xh=600,240
+    root.geometry(get_pos(xw,xh,root))
+    root['bg']='white'
+    #插入欢迎图片，可以是logo
+    logo='logo.png'
+    if os.path.exists(logo):
+        print("Lib/img exist")
+        photo = Image.open(logo)
+        photo=photo.resize((160,160))
+        bm = ImageTk.PhotoImage(photo)
+        lb_welcomelogo = Label(root, image = bm,bg='white')
+        lb_welcomelogo.bm = bm
+        lb_welcomelogo.place(x=40, y=40)
+    #插入文字，可以显示开发者或出处
+    lb_welcometext = Label(root, text = 'AmiaoSeat V1.0',
+                           fg='lightgray',font=Font(family='Times', size=28, weight='bold'),bg='white')
+    lb_welcometext.place(x=220, y=35,width=300,height=100)
+    canvas = Canvas(root, width=300, height=18, bg="white")
+    canvas.place(x=220, y=130)
+    cpr = Label(root, text = 'Copyright © 2021 MiuMiu',
+                           fg='lightgray',font=Font(family='Times', size=10),bg='white')
+    cpr.place(x=208, y=160,width=300,height=50)
+    fill_line = canvas.create_rectangle(1.5, 1.5, 0, 23, width=0, fill="pink")
+    x = 150  # 未知变量，可更改
+    n = 465 / x  # 465是矩形填充满的次数
+    for i in range(x):
+        n = n + 465 / x
+        canvas.coords(fill_line, (0, 0, n, 60))
+        root.update()
+        time.sleep(0.01)
+
+def closeWelcome():
+    # # #设置欢迎页停留时间
+    # for i in range(5):
+    #     # rootMSCT.attributes("-alpha", 0)#窗口透明度
+    #     time.sleep(1)
+    time.sleep(2)
+    while not finish_load:
+        continue
+    rootMSCT.attributes("-alpha", 1)#窗口透明度
+    rootMSCT.attributes('-topmost',True)
+    root.destroy()
+
+def app():
+    main()
 
 
 if __name__=='__main__':
-    main()
+    app()
 

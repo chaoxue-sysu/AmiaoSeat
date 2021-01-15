@@ -5,8 +5,8 @@ block_cipher = None
 
 a = Analysis(['main.py'],
              pathex=['D:\\Data\\Local\\Lab\\Program_data\\python\\projects\\Seat\\seat'],
-             binaries=[],
-             datas=[('logo.ico','.')],
+             binaries=[('logo.ico', '.'), ('logo.png', '.')],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
