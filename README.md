@@ -34,7 +34,7 @@ $ python main.py
 2. 打包 main.py（参考 [pyinstaller文档](https://pyinstaller.readthedocs.io/en/stable/usage.html)）: 
 
     `
-    $ pyinstaller -w -i logo.ico --add-binary logo.ico;. main.py
+    $ pyinstaller -w -i logo.ico --add-binary logo.ico;. --add-binary logo.png;. main.py
     `
 3. 打包后会在生成disk/main目录，在此目录下有`main.exe`程序，点击即可运行。
 
